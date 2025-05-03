@@ -95,8 +95,37 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _deleteJadwal(String id) async {
-    await FirebaseFirestore.instance.collection('jadwal').doc(id).delete();
+  void _deleteJadwal(String id, BuildContext context) async {
+     showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text("Konfirmasi Hapus"),
+        content: Text("Apakah Anda yakin ingin menghapus jadwal ini?"),
+        actions: <Widget>[
+          TextButton(
+            child: Text("Batal"),
+            onPressed: () {
+              Navigator.of(context).pop(); // Tutup dialog
+            },
+          ),
+          TextButton(
+            child: Text("Hapus", style: TextStyle(color: Colors.red)),
+            onPressed: () async {
+              Navigator.of(context).pop(); // Tutup dialog
+              await FirebaseFirestore.instance
+                  .collection('jadwal')
+                  .doc(id)
+                  .delete();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Jadwal berhasil dihapus")),
+              );
+            },
+          ),
+        ],
+      );
+    },
+  );
   }
 
   @override
@@ -157,7 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete),
-                          onPressed: () => _deleteJadwal(id),
+                          onPressed: () => _deleteJadwal(id, context),
                         ),
                       ],
                     ),
